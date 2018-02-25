@@ -39,6 +39,7 @@ namespace wwwserver
     void HttpResponse::generateHeader(int code)
     {
         m_response << "HTTP/1.0 " << code << std::endl;
+        m_response << "Server: wwwserver/0.1" << std::endl;
     }
 
     void HttpResponse::loadFile(Path &file)
@@ -69,6 +70,65 @@ namespace wwwserver
         m_response << content;
     }
 
+    void HttpResponse::loadDirListing(Path &dir)
+    {
+        m_response << "Content-Type: text/html" << std::endl << std::endl;
+
+        std::vector<Path> dirs = dir.getChildrenDirs();
+        std::vector<Path> files = dir.getChildrenFiles();
+
+        std::string web_dir_str = m_web_dir;
+        std::string dir_str = dir.str().substr(web_dir_str.size());
+
+        std::cout << "Listing for " << dir_str << std::endl;
+        std::cout << dirs.size() << " subdirectories, " << files.size() << " files" << std::endl;
+
+        // Print out the heading for the listing
+        m_response << "<!DOCTYPE html>" << std::endl
+                   << "<html>" << std::endl
+                   << "<head>" << std::endl
+                   << "\t<title>Listing for " << dir_str << "</title>" << std::endl
+                   << "\t<style type='text/css'>"
+                   << "\t\tbody {"<< std::endl
+                   << "\t\t\tfont-family: sans-serif;" << std::endl
+                   << "\t\t\tfont-size: 14px;"
+                   << "\t\t}" << std::endl
+                   << "\t</style>" << std::endl
+                   << "</head>" << std::endl
+                   << "<body>" << std::endl
+                   << "\t<h1>Directory Listing</h1>" << std::endl
+                   << "\t<h2>" << dir_str << "</h2>" << std::endl
+                   << "\t<ul>" << std::endl;
+
+        if(dir_str.size() != 0)
+        {
+            m_response << "\t\t<li><a href='" << dir_str << "/..'>Parent Directory</a></li>" << std::endl;
+        }
+
+        // Process subdirectories first
+        for(Path const &p : dirs)
+        {
+            std::string path_str = "/" + p.str().substr(web_dir_str.size()+1);
+            std::string display_str = p.str().substr(web_dir_str.size() + dir_str.size() + 1);
+            m_response << "\t\t<li><a href='" << path_str << "'>" << display_str << "</a></li>" << std::endl;
+        }
+
+        // Process all the files
+        for(Path const &p : files)
+        {
+            std::string path_str = "/" + p.str().substr(web_dir_str.size()+1);
+            std::string display_str = p.str().substr(web_dir_str.size() + dir_str.size() + 1);
+            m_response << "\t\t<li><a href='" << path_str << "'>" << display_str << "</a></li>" << std::endl;
+        }
+
+        // close out the page
+        m_response << "\t</ul>" << std::endl
+                   << "<hr>" << std::endl
+                   << "<footer><small>wwwserver/0.1</small></footer>" << std::endl
+                   << "</body>" << std::endl
+                   << "</html>" << std::endl;
+    }
+
     std::string HttpResponse::str()
     {
         return m_response.str();
@@ -94,7 +154,7 @@ namespace wwwserver
 
     HttpResponse HttpParse::parse()
     {
-        HttpResponse response;
+        HttpResponse response(m_web_dir);
 
         switch(m_req_type)
         {
@@ -116,6 +176,7 @@ namespace wwwserver
     void HttpParse::parseGet(HttpResponse &response)
     {
         int response_code = 200;
+        bool send_file = true;
         std::stringstream ss(m_request);
         std::string cmd, req_file, http_ver;
 
@@ -142,8 +203,7 @@ namespace wwwserver
             }
             else
             {
-                response_code = 404; // not found for now
-                // todo: directory listing
+                send_file = false;
             }
         }
 
@@ -151,8 +211,8 @@ namespace wwwserver
 
         if(response_code == 200)
         {
-            std::cout << "File found" << std::endl;
-            response.loadFile(file);
+            if(send_file) response.loadFile(file);
+            else response.loadDirListing(file);
         }
     }
 

@@ -32,6 +32,12 @@ namespace wwwserver
     public:
 
         /**
+         * Constructor
+         * @param web_dir The top level public web directory
+         */
+        HttpResponse(std::string web_dir) : m_web_dir(web_dir) {}
+
+        /**
          * generateHeader
          * @brief Generates the pre-content HTTP header with specified response code
          * @param code The HTTP/1.0 response code
@@ -53,6 +59,13 @@ namespace wwwserver
         void loadString(std::string &content);
 
         /**
+         * loadDirListing
+         * @brief Loads a directory listing as the content of the HTTP response
+         * @param dir The directory to list
+         */
+        void loadDirListing(Path &dir);
+
+        /**
          * clear
          * @brief Clears the state of the HttpResponse object
          */
@@ -69,6 +82,9 @@ namespace wwwserver
 
         /* A string stream used to build the HTTP response */
         std::stringstream m_response;
+
+        /* The web server top level directory */
+        std::string m_web_dir;
      };
 
     class HttpParse

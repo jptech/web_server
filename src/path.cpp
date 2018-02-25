@@ -99,7 +99,7 @@ namespace wwwserver
 
     std::vector<Path> Path::getChildrenDirs()
     {
-        std::vector<PathType> types {PathType::DIRECTORY, PathType::FILE};
+        std::vector<PathType> types {PathType::DIRECTORY};
         return getChildrenType(types);
     }
 
@@ -128,6 +128,7 @@ namespace wwwserver
         if(directory == NULL)
         {
             // handle error
+            std::cerr << "directory is null" << std::endl;
         }
 
         while( (entry = readdir(directory)) )
@@ -137,7 +138,7 @@ namespace wwwserver
             if(strncmp(entry->d_name, ".",  ssize) != 0 &&
                strncmp(entry->d_name, "..", ssize) != 0   )
             {
-                Path p(entry->d_name);
+                Path p(str() + "/" + entry->d_name);
 
                 if(std::find(types.begin(), types.end(), p.getType()) != types.end())
                 {

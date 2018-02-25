@@ -3,6 +3,8 @@
 
 #include <unistd.h>
 
+#include "exception_base.hpp"
+#include "exceptions.hpp"
 #include "server.hpp"
 
 int main(int argc, char **argv)
@@ -25,7 +27,7 @@ int main(int argc, char **argv)
     {
         s.setup();
     }
-    catch(std::exception e)
+    catch(wwwserver::ExceptionBase e)
     {
         std::cerr << e.what() << std::endl;
         return -1;
@@ -35,7 +37,7 @@ int main(int argc, char **argv)
     {
         s.loop();
     }
-    catch(std::exception e)
+    catch(wwwserver::ExceptionBase e)
     {
         std::cerr << e.what() << std::endl;
         return -1;
