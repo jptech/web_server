@@ -1,5 +1,4 @@
-#ifndef MIME_HPP
-#define MIME_HPP
+#pragma once
 
 #include <string>
 
@@ -22,5 +21,3 @@ namespace wwwserver{
     std::string get_type_string(MimeType m);
 
 }
-
-#endif

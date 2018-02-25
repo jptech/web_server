@@ -1,5 +1,4 @@
-#ifndef HTTP_HPP
-#define HTTP_HPP
+#pragma once
 
 #include <iostream>
 #include <string>
@@ -53,5 +52,3 @@ namespace wwwserver
     };
 
 }
-
-#endif
