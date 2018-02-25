@@ -12,6 +12,7 @@ namespace wwwserver{
         CSS,
         JAVASCRIPT,
         JPEG,
+        GIF,
         PNG,
         MPEG,
         EXEC,

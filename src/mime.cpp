@@ -9,6 +9,7 @@ namespace wwwserver
     std::string get_type_string(MimeType m)
     {
         std::string ret;
+
         switch(m)
         {
             case MimeType::HTML:        ret = "text/html"; break;
@@ -16,6 +17,7 @@ namespace wwwserver
             case MimeType::JAVASCRIPT:  ret = "text/javascript"; break;
             case MimeType::JPEG:        ret = "image/jpeg"; break;
             case MimeType::PNG:         ret = "image/png"; break;
+            case MimeType::GIF:         ret = "image/gif"; break;
             case MimeType::MPEG:        ret = "audio/mpeg"; break;
             case MimeType::EXEC:        ret = "application/octet-stream"; break;
             case MimeType::ICON:        ret = "image/x-icon"; break;
@@ -38,6 +40,7 @@ namespace wwwserver
             {"htm", MimeType::HTML},
             {"css", MimeType::CSS},
             {"js", MimeType::JAVASCRIPT},
+            {"gif", MimeType::GIF},
             {"jpg", MimeType::JPEG},
             {"jpeg", MimeType::JPEG},
             {"png", MimeType::PNG},
