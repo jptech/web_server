@@ -47,14 +47,13 @@ namespace wwwserver
             struct sockaddr_in c_addr;
             socklen_t c_len;
             int c_socket;
-            char buf[Server::BUFSIZE+1];
+            char *buf = new char[Server::BUFSIZE+1];
 
             std::cout << "Listening on socket " << m_socket << std::endl;
             listen(m_socket, 5);
 
             c_len = sizeof(c_addr);
             c_socket = accept(m_socket, (struct sockaddr *) &c_addr, &c_len);
-            std::cout << "c_socket (" << c_socket << ") accept" << std::endl;
 
             if(c_socket < 0)
             {
@@ -99,6 +98,7 @@ namespace wwwserver
             }
 
             delete parser;
+            delete buf;
             close(c_socket);
         }
     }

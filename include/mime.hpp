@@ -14,10 +14,15 @@ namespace wwwserver{
         JPEG,
         PNG,
         MPEG,
-        EXEC
+        EXEC,
+        ICON,
+        UNKNOWN
     };
 
     /* Get the string representation of a MIME type */
     std::string get_type_string(MimeType m);
+
+    /* Get the Mime Type for the file extension */
+    MimeType get_mime_type(std::string ext);
 
 }

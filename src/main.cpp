@@ -12,15 +12,7 @@ int main(int argc, char **argv)
     getcwd(cur_dir, sizeof(cur_dir));
     std::string web_dir = std::string(cur_dir) + "/www";
 
-    std::cout << "Web Dir: " << web_dir << std::endl;
-
-    for(int i = 0; i < argc; i++)
-    {
-        std::stringstream ss(argv[i]);
-        std::string str;
-        ss >> str;
-        std::cout << "Arg " << i << ": " << str << std::endl;
-    }
+    std::cout << "Web Root: " << web_dir << std::endl;
 
     if(argc > 1)
     {
@@ -29,7 +21,6 @@ int main(int argc, char **argv)
 
     wwwserver::Server s(port, web_dir);
 
-    std::cout << "Setting up socket" << std::endl;
     try
     {
         s.setup();
@@ -37,9 +28,9 @@ int main(int argc, char **argv)
     catch(std::exception e)
     {
         std::cerr << e.what() << std::endl;
+        return -1;
     }
 
-    std::cout << "Listening on " << port << std::endl;
     try
     {
         s.loop();
@@ -47,6 +38,7 @@ int main(int argc, char **argv)
     catch(std::exception e)
     {
         std::cerr << e.what() << std::endl;
+        return -1;
     }
 
     return 0;
