@@ -16,7 +16,6 @@ namespace wwwserver
     {
     public:
 
-
         /**
          * Constructor
          * @param port The server will be hosted at this port.
@@ -36,15 +35,25 @@ namespace wwwserver
          */
         void loop();
 
+        /**
+         * Destructor
+         */
         ~Server();
 
         /* 8KB standard buffer size */
         static const size_t BUFSIZE = 8096;
 
     private:
+        /* location of the top level web directory */
         std::string m_web_dir;
+
+        /* value to designate if the server has been set up correctly */
         bool m_setup;
+
+        /* the port number to listen for new connections */
         int m_port_num;
+
+        /* the socket file descriptor for listenting for new connections */
         int m_socket;
 
     };

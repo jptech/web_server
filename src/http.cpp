@@ -61,11 +61,6 @@ namespace wwwserver
         m_response << ifile.rdbuf();
     }
 
-    void HttpResponse::setContentType(MimeType mime)
-    {
-        m_file_mime = mime;
-    }
-
     void HttpResponse::loadString(std::string &content)
     {
         m_response << "Content-Type: text/html" << std::endl;

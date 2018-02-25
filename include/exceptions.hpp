@@ -16,8 +16,8 @@ namespace wwwserver
     NEW_EX(SocketBindFailure)
 
     /**
-     * @class
-     * @brief
+     * @class ClientSocketFailure
+     * @brief I/O failure on the socket from/to the client
      */
      NEW_EX(ClientSocketFailure)
 }
