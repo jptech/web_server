@@ -230,5 +230,12 @@ namespace wwwserver
          * @param path A vector of strings representing the new path
          */
         void updatePath(std::vector<std::string> &path, bool is_relative = false);
+
+        /**
+         * @brief Trims the spaces from a string
+         * @param s The input string to be trimmed
+         * @return The string 's' without extra spaces
+         */
+        std::string trim(const std::string& s) const;
     };
 }

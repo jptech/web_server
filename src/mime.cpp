@@ -48,7 +48,7 @@ namespace wwwserver
         // look up the extension to see its MIME type
         std::map<std::string, MimeType>::iterator mit = ext_table.find(ext);
 
-        if(mit == ext_table.end())
+        if(mit != ext_table.end())
         {
             ret = mit->second;
         }

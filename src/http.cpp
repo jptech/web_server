@@ -1,4 +1,5 @@
 #include "http.hpp"
+#include "path.hpp"
 
 namespace wwwserver
 {
@@ -40,18 +41,17 @@ namespace wwwserver
         m_response << "HTTP/1.0 " << code << std::endl;
     }
 
-    void HttpResponse::loadFile(std::string &fname)
+    void HttpResponse::loadFile(Path &file)
     {
         std::ifstream ifile;
+        std::string path = file.str();
         // todo: error checking
-        ifile.open(fname.c_str());
-        loadFile(ifile);
-    }
+        ifile.open(path.c_str());
 
-    void HttpResponse::loadFile(std::ifstream &ifile)
-    {
+        std::cout << "File Extension: " << file.extension() << std::endl;
+
         // mime type
-        m_response << "Content-Type: " << get_type_string(m_file_mime) << std::endl;
+        m_response << "Content-Type: " << get_type_string(get_mime_type(file.extension())) << std::endl;
 
         // todo: content length
 
@@ -118,48 +118,51 @@ namespace wwwserver
         return response;
     }
 
-    void HttpParse::cleanFilePath(std::string &fname)
-    {
-        // todo
-        fname = m_web_dir + fname;
-    }
-
     void HttpParse::parseGet(HttpResponse &response)
     {
         int response_code = 200;
         std::stringstream ss(m_request);
-        std::string cmd, file, http_ver;
+        std::string cmd, req_file, http_ver;
 
-        ss >> cmd >> file >> http_ver;
+        ss >> cmd >> req_file >> http_ver;
 
-        cleanFilePath(file);
-        std::cout << "Opening " << file << std::endl;
+        Path file = Path(m_web_dir + req_file);
 
-        std::ifstream ifile;
-        ifile.open(file.c_str());
+        std::cout << "Opening " << file.str() << std::endl;
 
-        if(! ifile.good())
+        if(! file.exists())
         {
             response_code = 404;
             std::cout << "File not found" << std::endl;
         }
 
-        if(response_code == 200) response.setContentType(MimeType::HTML);
+        if(file.isDir())
+        {
+            Path idx_file = file + "/index.html";
+            std::cout << "Looking for " << idx_file.str() << std::endl;
+
+            if(idx_file.exists())
+            {
+                file.setPath(idx_file.str());
+            }
+            else
+            {
+                response_code = 404; // not found for now
+                // todo: directory listing
+            }
+        }
+
         response.generateHeader(response_code);
 
         if(response_code == 200)
         {
             std::cout << "File found" << std::endl;
-            response.loadFile(ifile);
+            response.loadFile(file);
         }
-
-        ifile.close();
     }
 
     void HttpParse::parseError(HttpResponse &response)
     {
-        int response_code = 400; // bad request
-
-        response.generateHeader(400);
+        response.generateHeader(500); // internal error
     }
 }

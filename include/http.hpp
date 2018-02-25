@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include "mime.hpp"
+#include "path.hpp"
 
 namespace wwwserver
 {
@@ -25,8 +26,7 @@ namespace wwwserver
     public:
         void generateHeader(int code);
         void setContentType(MimeType mime);
-        void loadFile(std::string &fname);
-        void loadFile(std::ifstream &ifile);
+        void loadFile(Path &file);
         void loadString(std::string &content);
         void clear();
         std::string str();
@@ -42,7 +42,6 @@ namespace wwwserver
         HttpRequestType getRequestType();
         HttpResponse parse();
     private:
-        void cleanFilePath(std::string &fname);
         void parseGet(HttpResponse &response);
         void parseError(HttpResponse &response);
 

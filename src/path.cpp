@@ -68,8 +68,6 @@ namespace wwwserver
 
     std::string Path::extension() const
     {
-        std::string ext;
-
         // The path must be a file for it to have a file extension
         if(!isFile()) return "";
 
@@ -77,7 +75,9 @@ namespace wwwserver
         std::string fname = filename();
 
         // locate the extension by doing a reverse find for '.'
-        return fname.substr(fname.rfind('.'));
+        std::string ext = fname.substr(fname.rfind('.')+1);
+
+        return trim(ext);
     }
 
     Path Path::getParent() const
@@ -405,5 +405,15 @@ namespace wwwserver
     {
         m_stat.reset(nullptr);
         m_path_type = PathType::NOT_SET;
+    }
+
+    std::string Path::trim(const std::string& s) const
+    {
+        size_t space = s.find_first_not_of(' ');
+        if (space == std::string::npos)
+        {
+            return s;
+        }
+        return s.substr(space, (s.find_last_not_of(' ') - space + 1));
     }
 }
