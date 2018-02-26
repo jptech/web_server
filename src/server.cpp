@@ -30,8 +30,6 @@ namespace wwwserver
             throw SocketBindFailure(strerror(errno));
         }
 
-        std::cout << "Socket binded to port " << ntohs(s_addr.sin_port) << std::endl;
-
         m_setup = true;
     }
 
@@ -49,7 +47,6 @@ namespace wwwserver
             int c_socket;
             char *buf = new char[Server::BUFSIZE+1];
 
-            std::cout << "Listening on socket " << m_socket << std::endl;
             listen(m_socket, 5);
 
             c_len = sizeof(c_addr);
@@ -57,7 +54,6 @@ namespace wwwserver
 
             if(c_socket < 0)
             {
-                std::cerr << "c_socket error " << c_socket << std::endl;
                 close(c_socket);
                 throw ClientSocketFailure("Error with client socket");
             }
@@ -76,17 +72,10 @@ namespace wwwserver
                 throw ClientSocketFailure("Reading from client socket failed.");
             }
 
-            std::cout << "Read (ret: " << ret << "): " << std::endl;
-            std::cout << buf << std::endl;
-
             // Send Response
-            //HttpParse client_parser(std::string(buf));
             std::string strbuf = std::string(buf);
             HttpParse *parser = new HttpParse(strbuf, m_web_dir);
             HttpResponse response = parser->parse();
-
-            std::cout << std::endl << "Response: " << std::endl << std::endl;
-            std::cout << response.str().c_str() << std::endl;
 
             ret = write(c_socket, response.str().c_str(), response.str().size()+1);
             if(ret <= 0)
