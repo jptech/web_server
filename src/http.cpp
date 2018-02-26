@@ -91,7 +91,7 @@ namespace wwwserver
                    << "\t<style type='text/css'>"
                    << "\t\tbody {"<< std::endl
                    << "\t\t\tfont-family: sans-serif;" << std::endl
-                   << "\t\t\tfont-size: 14px;"
+                   << "\t\t\tfont-size: 14px;" << std::endl
                    << "\t\t}" << std::endl
                    << "\t</style>" << std::endl
                    << "</head>" << std::endl
@@ -123,6 +123,38 @@ namespace wwwserver
 
         // close out the page
         m_response << "\t</ul>" << std::endl
+                   << "<hr>" << std::endl
+                   << "<footer><small>wwwserver/0.1</small></footer>" << std::endl
+                   << "</body>" << std::endl
+                   << "</html>" << std::endl;
+    }
+
+    void HttpResponse::loadError(int code)
+    {
+        std::string error_msg;
+
+        switch(code)
+        {
+            case 404: error_msg = "Page Not Found"; break;
+            default:
+            case 500: error_msg = "Internal Server Error"; break;
+        }
+
+        m_response << "Content-Type: text/html" << std::endl << std::endl;
+
+        m_response << "<!DOCTYPE html>" << std::endl
+                   << "<html>" << std::endl
+                   << "<head>" << std::endl
+                   << "\t<title>" << error_msg << "</title>" << std::endl
+                   << "\t<style type='text/css'>"
+                   << "\t\tbody {"<< std::endl
+                   << "\t\t\tfont-family: sans-serif;" << std::endl
+                   << "\t\t\tfont-size: 14px;" << std::endl
+                   << "\t\t}" << std::endl
+                   << "\t</style>" << std::endl
+                   << "</head>" << std::endl
+                   << "<body>" << std::endl
+                   << "<h1>HTTP/1.0 " << code << " " << error_msg << "</h1>" << std::endl
                    << "<hr>" << std::endl
                    << "<footer><small>wwwserver/0.1</small></footer>" << std::endl
                    << "</body>" << std::endl
@@ -213,6 +245,10 @@ namespace wwwserver
         {
             if(send_file) response.loadFile(file);
             else response.loadDirListing(file);
+        }
+        else
+        {
+            response.loadError(response_code);
         }
     }
 

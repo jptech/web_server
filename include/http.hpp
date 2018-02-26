@@ -66,6 +66,13 @@ namespace wwwserver
         void loadDirListing(Path &dir);
 
         /**
+         * loadError
+         * @brief Loads the approriate error page into the response.
+         * @param code The integer HTTTP status code corresponding to the error.
+         */
+        void loadError(int code);
+
+        /**
          * clear
          * @brief Clears the state of the HttpResponse object
          */
