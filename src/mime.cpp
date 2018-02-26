@@ -15,9 +15,15 @@ namespace wwwserver
             case MimeType::HTML:        ret = "text/html"; break;
             case MimeType::CSS:         ret = "text/css"; break;
             case MimeType::JAVASCRIPT:  ret = "text/javascript"; break;
+            case MimeType::CSV:         ret = "text/csv"; break;
             case MimeType::JPEG:        ret = "image/jpeg"; break;
             case MimeType::PNG:         ret = "image/png"; break;
             case MimeType::GIF:         ret = "image/gif"; break;
+            case MimeType::PDF:         ret = "application/pdf"; break;
+            case MimeType::ZIP:         ret = "application/zip"; break;
+            case MimeType::XML:         ret = "application/xml"; break;
+            case MimeType::JSON:        ret = "application/json"; break;
+            case MimeType::MSDOC:       ret = "application/msword"; break;
             case MimeType::MPEG:        ret = "audio/mpeg"; break;
             case MimeType::EXEC:        ret = "application/octet-stream"; break;
             case MimeType::ICON:        ret = "image/x-icon"; break;
@@ -45,7 +51,12 @@ namespace wwwserver
             {"jpeg", MimeType::JPEG},
             {"png", MimeType::PNG},
             {"exe", MimeType::EXEC},
-            {"txt", MimeType::TEXT}
+            {"txt", MimeType::TEXT},
+            {"json", MimeType::JSON},
+            {"pdf", MimeType::PDF},
+            {"doc", MimeType::MSDOC},
+            {"zip", MimeType::ZIP},
+            {"xml", MimeType::XML}
         };
 
         // look up the extension to see its MIME type

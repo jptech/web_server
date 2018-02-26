@@ -15,6 +15,12 @@ namespace wwwserver{
         GIF,
         PNG,
         MPEG,
+        PDF,
+        ZIP,
+        MSDOC,
+        XML,
+        JSON,
+        CSV,
         EXEC,
         ICON,
         UNKNOWN
