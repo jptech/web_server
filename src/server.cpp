@@ -50,9 +50,8 @@ namespace wwwserver
             struct sockaddr_in c_addr;
             socklen_t c_len;
             int c_socket;
-            char *buf = new char[Server::BUFSIZE+1];
 
-            listen(m_socket, 5);
+            listen(m_socket, 32);
 
             c_len = sizeof(c_addr);
             c_socket = accept(m_socket, (struct sockaddr *) &c_addr, &c_len);
@@ -63,6 +62,8 @@ namespace wwwserver
             {
                 // we don't need the listen socket here
                 close(m_socket);
+
+                char *buf = new char[Server::BUFSIZE+1];
 
                 if(c_socket < 0)
                 {
@@ -107,8 +108,10 @@ namespace wwwserver
                 delete buf;
                 exit(0);
             }
-
-            close(c_socket);
+            else
+            {
+                close(c_socket);
+            }
         }
     }
 

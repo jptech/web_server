@@ -179,8 +179,8 @@ namespace wwwserver
 
         if(m_load_file)
         {
-            const int buf_size = 4096;
-            char buf[buf_size]; // 4kb buffer
+            const int buf_size = 8192;
+            char buf[buf_size]; // 8KB buffer
 
             int file_fd = open(m_file.str().c_str(), O_RDONLY);
 
@@ -192,6 +192,8 @@ namespace wwwserver
                 wr = write(socket_fd, buf, rd);
                 rd = read(file_fd, buf, buf_size);
             }
+
+            close(file_fd);
         }
     }
 
