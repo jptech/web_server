@@ -52,6 +52,13 @@ namespace wwwserver
         void loadFile(Path &file);
 
         /**
+         * loadCgi
+         * @brief Executes a cgi script and loads the response
+         * @param file A path object to the desired cgi script
+         */
+        void loadCgi(Path &file);
+
+        /**
          * loadString
          * @brief Loads a string as the content of the HTTP response
          * @param content A string of the desired response content
@@ -78,6 +85,11 @@ namespace wwwserver
          */
         void clear();
 
+        /**
+         * writeSocket
+         * @brief Writes the response to the desired socket file descriptor
+         * @param socket_fd The socket file descriptor
+         */
         void writeSocket(int socket_fd);
 
         /**

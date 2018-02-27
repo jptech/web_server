@@ -46,21 +46,19 @@ namespace wwwserver
 
     void HttpResponse::loadFile(Path &file)
     {
-        std::cout << "File Extension: " << file.extension() << std::endl;
-
         // mime type
         m_response << "Content-Type: " << get_type_string(get_mime_type(file.extension())) << std::endl;
 
-        // todo: content length
-        m_response << "Content-length: " << file.filesize() << std::endl;
+        // content length
+        m_response << "Content-Length: " << file.filesize() << std::endl << std::endl;
 
         m_load_file = true;
         m_file.setPath(file.str());
+    }
 
-        // file content
-        // todo? -- NOT EFFICIENT
-        m_response << std::endl;
-        //m_response << ifile.rdbuf();
+    void HttpResponse::loadCgi(Path &file)
+    {
+        // todo
     }
 
     void HttpResponse::loadString(std::string &content)
@@ -80,9 +78,6 @@ namespace wwwserver
 
         std::string web_dir_str = m_web_dir;
         std::string dir_str = dir.str().substr(web_dir_str.size());
-
-        std::cout << "Listing for " << dir_str << std::endl;
-        std::cout << dirs.size() << " subdirectories, " << files.size() << " files" << std::endl;
 
         // Print out the heading for the listing
         m_response << "<!DOCTYPE html>" << std::endl
@@ -247,8 +242,6 @@ namespace wwwserver
 
         Path file = Path(m_web_dir + req_file);
 
-        std::cout << "Opening " << file.str() << std::endl;
-
         if(! file.exists())
         {
             response_code = 404;
@@ -258,7 +251,6 @@ namespace wwwserver
         if(file.isDir())
         {
             Path idx_file = file + "/index.html";
-            std::cout << "Looking for " << idx_file.str() << std::endl;
 
             if(idx_file.exists())
             {
