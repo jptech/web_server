@@ -351,16 +351,18 @@ namespace wwwserver
 
         // Clean the path string
         std::replace(path.begin(), path.end(), '\\', '/');
-        realpath(path.c_str(), path_cstr);
 
-        if (path_cstr == nullptr)
+
+        if( realpath(path.c_str(), path_cstr) == NULL )
         {
-            // throw exception
-            throw "realpath failed";
+            // path probably does not exist
+            m_path_str = path.c_str();
         }
-
-        // save the path string
-        m_path_str = path_cstr;
+        else
+        {
+            // save the path string
+            m_path_str = path_cstr;
+        }
 
         // clear out the old path vector
         m_path_components.clear();
