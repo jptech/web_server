@@ -1,5 +1,6 @@
 #include "http.hpp"
 #include "path.hpp"
+#include "exceptions.hpp"
 
 namespace wwwserver
 {
@@ -34,6 +35,7 @@ namespace wwwserver
     void HttpResponse::clear()
     {
         m_response.clear();
+        m_load_file = false;
     }
 
     void HttpResponse::generateHeader(int code)
@@ -44,22 +46,21 @@ namespace wwwserver
 
     void HttpResponse::loadFile(Path &file)
     {
-        std::ifstream ifile;
-        std::string path = file.str();
-        // todo: error checking
-        ifile.open(path.c_str());
-
         std::cout << "File Extension: " << file.extension() << std::endl;
 
         // mime type
         m_response << "Content-Type: " << get_type_string(get_mime_type(file.extension())) << std::endl;
 
         // todo: content length
+        m_response << "Content-length: " << file.filesize() << std::endl;
+
+        m_load_file = true;
+        m_file.setPath(file.str());
 
         // file content
         // todo? -- NOT EFFICIENT
         m_response << std::endl;
-        m_response << ifile.rdbuf();
+        //m_response << ifile.rdbuf();
     }
 
     void HttpResponse::loadString(std::string &content)
@@ -166,6 +167,34 @@ namespace wwwserver
         return m_response.str();
     }
 
+    void HttpResponse::writeSocket(int socket_fd)
+    {
+        int ret = write(socket_fd, m_response.str().c_str(), m_response.str().size());
+        if(ret < 0)
+        {
+            std::stringstream ss;
+            ss << "Socket write returned " << ret;
+            throw ClientSocketFailure(ss.str());
+        }
+
+        if(m_load_file)
+        {
+            const int buf_size = 4096;
+            char buf[buf_size]; // 4kb buffer
+
+            int file_fd = open(m_file.str().c_str(), O_RDONLY);
+
+            int rd = read(file_fd, buf, buf_size);
+            int wr = 1;
+
+            while(rd > 0 && wr > 0)
+            {
+                wr = write(socket_fd, buf, rd);
+                rd = read(file_fd, buf, buf_size);
+            }
+        }
+    }
+
     HttpParse::HttpParse(std::string request, std::string web_dir)
     {
         std::stringstream ss;
@@ -256,4 +285,5 @@ namespace wwwserver
     {
         response.generateHeader(500); // internal error
     }
+
 }

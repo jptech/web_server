@@ -10,7 +10,7 @@ SOURCES := $(wildcard src/*.cpp)
 OBJECTS := $(SOURCES:$(SRC)/%.cpp=$(OBJ)/%.o)
 EXEC = $(BIN)/web_server
 
-CFLAGS =  -g -Wall -Wextra -std=c++11 $(INC)
+CFLAGS = -O3 -g -Wall -Wextra -std=c++11 $(INC)
 
 .PHONY: all
 all: $(EXEC)

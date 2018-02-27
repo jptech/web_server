@@ -179,6 +179,8 @@ namespace wwwserver
          */
         std::vector<std::string> vec() const;
 
+        size_t filesize() const;
+
     private:
 
         /**
@@ -200,6 +202,11 @@ namespace wwwserver
          * classification of the current path
          */
         PathType m_path_type;
+
+        /**
+         * The size of the file in bytes
+         */
+        size_t m_fsize;
 
         /**
          * @brief Gets all the children of a certain type in the current directory

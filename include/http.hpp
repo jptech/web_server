@@ -35,7 +35,7 @@ namespace wwwserver
          * Constructor
          * @param web_dir The top level public web directory
          */
-        HttpResponse(std::string web_dir) : m_web_dir(web_dir) {}
+        HttpResponse(std::string web_dir) : m_web_dir(web_dir), m_load_file(false) {}
 
         /**
          * generateHeader
@@ -78,6 +78,8 @@ namespace wwwserver
          */
         void clear();
 
+        void writeSocket(int socket_fd);
+
         /**
          * str
          * @brief Generates the HTTP response as a string
@@ -92,6 +94,12 @@ namespace wwwserver
 
         /* The web server top level directory */
         std::string m_web_dir;
+
+        /* Path to file to send */
+        Path m_file;
+
+        /* Indicate if a file should be sent */
+        bool m_load_file;
      };
 
     class HttpParse
@@ -118,6 +126,7 @@ namespace wwwserver
          * @return The server's respose to the client's request
          */
         HttpResponse parse();
+
     private:
 
         /**

@@ -249,6 +249,11 @@ namespace wwwserver
         return m_path_type;
     }
 
+    size_t Path::filesize() const
+    {
+        return m_fsize;
+    }
+
     void Path::updateStat()
     {
         int stat_rv;
@@ -261,6 +266,9 @@ namespace wwwserver
 
         // get the stat for the path
         stat_rv = stat(m_path_str.c_str(), m_stat.get());
+
+        // get the file size
+        m_fsize = m_stat.get()->st_size;
 
         // if there was an error, determine why
         if( stat_rv != 0 )
