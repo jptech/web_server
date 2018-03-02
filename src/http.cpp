@@ -362,15 +362,10 @@ namespace wwwserver
         std::string line;
         std::ofstream fout;
 
-        while(getline(sin, line) && line.size() > 0)
-        {
-            std::cout << line << std::endl;
-        }
-        std::cout << "This should be the end of the header\n";
+        while(getline(sin, line) && line.size() > 2);
         fout.open("formdata.txt");
         while(getline(sin, line))
         {
-            std::cout << line << std::endl;
             fout << line << std::endl;
         }
         fout.close();
