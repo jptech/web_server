@@ -1,3 +1,5 @@
 bin/*
 obj/*
+www/cgi-bin/*
+cgi-bin
 *.o

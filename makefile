@@ -4,11 +4,12 @@ LFLAGS = -lpthread
 SRC = src
 OBJ = obj
 BIN = bin
+WWW = www
 CSRC = cgi-src
-CBIN = cgi-bin
+CBIN = www/cgi-bin
 INCD = include 
 INC = -Iinclude
-DIRS := $(SRC) $(OBJ) $(BIN) $(CSRC) $(CBIN) $(INCD)
+DIRS := $(WWW) $(SRC) $(OBJ) $(BIN) $(CSRC) $(CBIN) $(INCD)
 HEADERS := $(wildcard inlcude/*.hpp)
 SOURCES := $(wildcard src/*.cpp)
 OBJECTS := $(SOURCES:$(SRC)/%.cpp=$(OBJ)/%.o)
