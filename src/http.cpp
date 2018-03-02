@@ -58,7 +58,60 @@ namespace wwwserver
 
     void HttpResponse::loadCgi(Path &file)
     {
-        // todo
+        /* the old stdin, used by the parent to temporarily hold stdin while it is being used */
+        int oldin;
+        /* the pipe file descriptors, 0 is the read end */
+        int pipefd[2];
+        /* the process id: 0 if this is the child, and the pid of the child if the parent */
+        int pid;
+        char *alist[2];
+        std::string line;
+
+        /* build the argument list 
+            we are not passing arguments though */
+        alist[0] = (char *)((file.str()).c_str()); //yo dawg i heard you like conversions...
+        alist[1] = NULL;
+
+        if(pipe(pipefd) != 0)
+        {
+            m_response << "CGI Error: Failed to open pipe\n";
+        }
+        else
+        {
+            pid = fork();
+            
+            /* child fork */
+            if(pid == 0)
+            {
+                //copy stdout to the end of the pipe that reads
+                dup2(pipefd[1], 1);
+                //close both ends of the pipe child-side so that the os can close the pipe gracefully
+                close(pipefd[1]);
+                close(pipefd[0]);
+
+                /* run the cgi script */
+                execvp(alist[0], alist);
+                m_response << "CGI Error: Failed to open " << file.str() << std::endl;
+            }
+            /* parent fork */
+            else
+            {
+                /* stash stdin during cgi script */
+                oldin = dup(0);
+                /* handle pipes as in child, except stdin */
+                dup2(pipefd[0], 0);
+                close(pipefd[0]);
+                close(pipefd[1]);
+
+                while(getline(std::cin, line))
+                {
+                    m_response << line << std::endl;
+                }
+                //this should kill the write end of the pipe
+                dup2(oldin, 0);
+
+            }
+        }
     }
 
     void HttpResponse::loadString(std::string &content)
