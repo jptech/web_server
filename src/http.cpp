@@ -2,6 +2,7 @@
 #include "path.hpp"
 #include "exceptions.hpp"
 #include <cstring>
+#include <map>
 
 namespace wwwserver
 {
@@ -67,17 +68,8 @@ namespace wwwserver
         int pid;
         char *alist = NULL;
         std::string line;
-        char clin[4096];
-
         
         m_response << "Content-Type: text/html" << std::endl << std::endl;
-
-        /* build the argument list 
-            we are not passing arguments though */
-        //alist[0] = (char *) file.str().c_str(); //yo dawg i heard you like conversions...
-        //alist[1] = NULL;
-
-        //printf("TEST %s\n", alist[0]);
 
         if(pipe(pipefd) != 0)
         {
@@ -113,7 +105,6 @@ namespace wwwserver
             }
             else
             {
-                
                 /* stash stdin during cgi script */
                 oldin = dup(0);
                 /* handle pipes as in child, except stdin */
@@ -125,21 +116,12 @@ namespace wwwserver
                 m_response << "<html>" << std::endl;
                 m_response << "\t<title> CGI output for " << file.str() <<"</title>" << std::endl;
                 m_response << "<body>" << std::endl;
-                //std::cout << "Content-Type: text/html" << std::endl;
-                std::cout << "<html>" << std::endl;
-                std::cout << "<body> CGI output for " << file.str() << std::endl;
+
                 while(getline(std::cin, line))
-                //while(read(0, clin, 4095))
                 {
-                    //read(0, clin, 4095);
-                    //if(strlen(clin) > 0)
-                    //m_response << clin << std::endl;
-                    //std::cout << clin << std::endl;
                     m_response << line << std::endl;
-                    std::cout << line << std::endl;
                 }
                 m_response << "</body> </html>" << std::endl;
-                std::cout << "</body> </html>" << std::endl;
                 //this should kill the write end of the pipe
                 dup2(oldin, 0);
 
@@ -305,9 +287,11 @@ namespace wwwserver
             case HttpRequestType::GET:
                 parseGet(response);
                 break;
+            case HttpRequestType::POST:
+                parsePost(response);
+                break;
             case HttpRequestType::HEAD:
             case HttpRequestType::PUT:
-            case HttpRequestType::POST:
             default:
                 parseError(response);
                 std::cerr << "Request type not yet supported" << std::endl;
@@ -369,6 +353,29 @@ namespace wwwserver
         {
             response.loadError(response_code);
         }
+    }
+
+    void HttpParse::parsePost(HttpResponse &response)
+    {
+        int response_code = 200;
+        std::stringstream sin(m_request);
+        std::string line;
+        std::ofstream fout;
+
+        while(getline(sin, line) && line.size() > 0)
+        {
+            std::cout << line << std::endl;
+        }
+        std::cout << "This should be the end of the header\n";
+        fout.open("formdata.txt");
+        while(getline(sin, line))
+        {
+            std::cout << line << std::endl;
+            fout << line << std::endl;
+        }
+        fout.close();
+
+        parseGet(response);
     }
 
     void HttpParse::parseError(HttpResponse &response)

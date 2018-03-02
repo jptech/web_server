@@ -149,6 +149,13 @@ namespace wwwserver
         void parseGet(HttpResponse &response);
 
         /**
+         * @brief Parses and services form actions via POST commands
+         * 
+         * @param response The outgoing HTTP response
+         */
+        void parsePost(HttpResponse &response);
+
+        /**
          * parseError
          * @brief The default error case handling
          * @param response The outgoing HTTP response
