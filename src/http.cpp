@@ -65,7 +65,7 @@ namespace wwwserver
         int pipefd[2];
         /* the process id: 0 if this is the child, and the pid of the child if the parent */
         int pid;
-        char *alist[2];
+        char *alist = NULL;
         std::string line;
         char clin[4096];
 
@@ -73,8 +73,10 @@ namespace wwwserver
 
         /* build the argument list 
             we are not passing arguments though */
-        alist[0] = (char *)((file.str()).c_str()); //yo dawg i heard you like conversions...
-        alist[1] = NULL;
+        //alist[0] = (char *) file.str().c_str(); //yo dawg i heard you like conversions...
+        //alist[1] = NULL;
+
+        //printf("TEST %s\n", alist[0]);
 
         if(pipe(pipefd) != 0)
         {
@@ -84,22 +86,21 @@ namespace wwwserver
         {
             m_response << "Content-Type: text/html" << std::endl;
             m_response << "<html>" << std::endl;
-            m_response << "\t<title> CGI output for " << file.str() <<"</title>" << std::endl;
-            m_response << "<body>" << std::endl;
+            m_response << "<body><p> CGI output for " << file.str() <<"</p>" << std::endl;
             pid = fork();
             
             /* child fork */
             if(pid == 0)
             {
                 //copy stdout to the end of the pipe that reads
-                //dup2(pipefd[1], 1);
+                dup2(pipefd[1], 1);
                 //close both ends of the pipe child-side so that the os can close the pipe gracefully
                 close(pipefd[1]);
                 close(pipefd[0]);
 
-                std::cout << "TEST " <<  alist[0] << std::endl;
+                //std::cout << "TEST " <<  alist[0] << std::endl;
                 /* run the cgi script */
-                execvp(alist[0], alist);
+                execvp(file.str().c_str(), &alist);
                 std::cerr << "Failure to launch cgi\n";
                 m_response << "CGI Error: Failed to open " << file.str() 
                     << "</body></html>" << std::endl;
@@ -127,15 +128,15 @@ namespace wwwserver
                 //std::cout << "Content-Type: text/html" << std::endl;
                 std::cout << "<html>" << std::endl;
                 std::cout << "<body> CGI output for " << file.str() << std::endl;
-                //while(getline(std::cin, line))
-                while(read(0, clin, 4095))
+                while(getline(std::cin, line))
+                //while(read(0, clin, 4095))
                 {
-                    read(0, clin, 4095);
-                    if(strlen(clin) > 0)
-                    m_response << clin << std::endl;
-                    std::cout << clin << std::endl;
-                    //m_response << line << std::endl;
-                    //std::cout << line << std::endl;
+                    //read(0, clin, 4095);
+                    //if(strlen(clin) > 0)
+                    //m_response << clin << std::endl;
+                    //std::cout << clin << std::endl;
+                    m_response << line << std::endl;
+                    std::cout << line << std::endl;
                 }
                 m_response << "</body> </html>" << std::endl;
                 std::cout << "</body> </html>" << std::endl;
