@@ -56,6 +56,11 @@ namespace wwwserver
         return m_path_type == PathType::FILE;
     }
 
+    bool Path::isCgi() const
+    {
+        return m_path_type == PathType::FILE && extension() == "cgi";
+    }
+
     bool Path::exists() const
     {
         return m_path_type != PathType::NOT_FOUND;

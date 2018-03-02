@@ -1,6 +1,7 @@
 #include "http.hpp"
 #include "path.hpp"
 #include "exceptions.hpp"
+#include <cstring>
 
 namespace wwwserver
 {
@@ -66,6 +67,9 @@ namespace wwwserver
         int pid;
         char *alist[2];
         std::string line;
+        char clin[4096];
+
+        
 
         /* build the argument list 
             we are not passing arguments though */
@@ -78,24 +82,37 @@ namespace wwwserver
         }
         else
         {
+            m_response << "Content-Type: text/html" << std::endl;
+            m_response << "<html>" << std::endl;
+            m_response << "\t<title> CGI output for " << file.str() <<"</title>" << std::endl;
+            m_response << "<body>" << std::endl;
             pid = fork();
             
             /* child fork */
             if(pid == 0)
             {
                 //copy stdout to the end of the pipe that reads
-                dup2(pipefd[1], 1);
+                //dup2(pipefd[1], 1);
                 //close both ends of the pipe child-side so that the os can close the pipe gracefully
                 close(pipefd[1]);
                 close(pipefd[0]);
 
+                std::cout << "TEST " <<  alist[0] << std::endl;
                 /* run the cgi script */
                 execvp(alist[0], alist);
-                m_response << "CGI Error: Failed to open " << file.str() << std::endl;
+                std::cerr << "Failure to launch cgi\n";
+                m_response << "CGI Error: Failed to open " << file.str() 
+                    << "</body></html>" << std::endl;
             }
             /* parent fork */
+            else if (pid == -1)
+            {
+                m_response << "CGI Error: Fork failure."
+                    << "</body></html>" << std::endl;
+            }
             else
             {
+                
                 /* stash stdin during cgi script */
                 oldin = dup(0);
                 /* handle pipes as in child, except stdin */
@@ -103,10 +120,25 @@ namespace wwwserver
                 close(pipefd[0]);
                 close(pipefd[1]);
 
-                while(getline(std::cin, line))
+                //m_response << "Content-Type: text/html" << std::endl;
+                m_response << "<html>" << std::endl;
+                m_response << "\t<title> CGI output for " << file.str() <<"</title>" << std::endl;
+                m_response << "<body>" << std::endl;
+                //std::cout << "Content-Type: text/html" << std::endl;
+                std::cout << "<html>" << std::endl;
+                std::cout << "<body> CGI output for " << file.str() << std::endl;
+                //while(getline(std::cin, line))
+                while(read(0, clin, 4095))
                 {
-                    m_response << line << std::endl;
+                    read(0, clin, 4095);
+                    if(strlen(clin) > 0)
+                    m_response << clin << std::endl;
+                    std::cout << clin << std::endl;
+                    //m_response << line << std::endl;
+                    //std::cout << line << std::endl;
                 }
+                m_response << "</body> </html>" << std::endl;
+                std::cout << "</body> </html>" << std::endl;
                 //this should kill the write end of the pipe
                 dup2(oldin, 0);
 
@@ -319,7 +351,17 @@ namespace wwwserver
 
         if(response_code == 200)
         {
-            if(send_file) response.loadFile(file);
+            if(send_file) 
+            {
+                if(file.isCgi())
+                {
+                    response.loadCgi(file);
+                }
+                else
+                {
+                    response.loadFile(file);
+                }
+            }
             else response.loadDirListing(file);
         }
         else

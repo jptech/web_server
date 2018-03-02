@@ -70,6 +70,15 @@ namespace wwwserver
         bool isFile() const;
 
         /**
+         * @brief Determines if path is a cgi script
+         * 
+         * @return true file is a cgi script
+         * @return false file is not a cgi script
+         */
+        bool isCgi() const;
+
+
+        /**
          * @brief Determines if path exists
          * @return true if the path exists, false otherwise
          */
