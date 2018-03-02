@@ -70,6 +70,7 @@ namespace wwwserver
         char clin[4096];
 
         
+        m_response << "Content-Type: text/html" << std::endl << std::endl;
 
         /* build the argument list 
             we are not passing arguments though */
@@ -84,7 +85,6 @@ namespace wwwserver
         }
         else
         {
-            m_response << "Content-Type: text/html" << std::endl;
             m_response << "<html>" << std::endl;
             m_response << "<body><p> CGI output for " << file.str() <<"</p>" << std::endl;
             pid = fork();
