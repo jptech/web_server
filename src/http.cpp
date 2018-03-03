@@ -67,9 +67,13 @@ namespace wwwserver
         /* the process id: 0 if this is the child, and the pid of the child if the parent */
         int pid;
         char *alist = NULL;
+        char *pargv[3];
         std::string line;
 
         m_response << "Content-Type: text/html" << std::endl << std::endl;
+        pargv[0] = strdup(file.str().c_str());
+        pargv[1] = "7";
+        pargv[2] = NULL;
 
         if(pipe(pipefd) != 0)
         {
@@ -92,7 +96,7 @@ namespace wwwserver
 
                 //std::cout << "TEST " <<  alist[0] << std::endl;
                 /* run the cgi script */
-                execvp(file.str().c_str(), &alist);
+                execvp(file.str().c_str(), pargv);
                 std::cerr << "Failure to launch cgi\n";
                 m_response << "CGI Error: Failed to open " << file.str()
                     << "</body></html>" << std::endl;
