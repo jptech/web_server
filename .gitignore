@@ -3,3 +3,4 @@ obj/*
 www/cgi-bin/*
 cgi-bin
 *.o
+formdata.txt
