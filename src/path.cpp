@@ -124,7 +124,6 @@ namespace wwwserver
     {
         std::vector<Path> children;
 
-        // *** ENTER C LAND *** //
         DIR *directory;
         struct dirent *entry;
 
@@ -136,13 +135,16 @@ namespace wwwserver
             std::cerr << "directory is null" << std::endl;
         }
 
+        // traverse the directory
         while( (entry = readdir(directory)) )
         {
             int ssize = strlen(entry->d_name);
 
+            // ignore . and ..
             if(strncmp(entry->d_name, ".",  ssize) != 0 &&
                strncmp(entry->d_name, "..", ssize) != 0   )
             {
+                // make a new path object for the child
                 Path p(str() + "/" + entry->d_name);
 
                 if(std::find(types.begin(), types.end(), p.getType()) != types.end())
@@ -153,7 +155,6 @@ namespace wwwserver
         }
 
         closedir(directory);
-        // *** EXIT C LAND *** //
 
         return children;
     }
@@ -231,7 +232,7 @@ namespace wwwserver
 
         if(relative)
         {
-            // TODO
+            throw "Relative path str is not yet supported";
         }
         else
         {
@@ -283,7 +284,6 @@ namespace wwwserver
                 // Permissions issue
                 case EACCES:
                 {
-                    // TODO: throw exception
                     throw "Permissions Error";
                     break;
                 }
@@ -357,7 +357,6 @@ namespace wwwserver
         // Clean the path string
         std::replace(path.begin(), path.end(), '\\', '/');
 
-
         if( realpath(path.c_str(), path_cstr) == NULL )
         {
             // path probably does not exist
@@ -390,6 +389,8 @@ namespace wwwserver
         std::stringstream ss;
         std::string path_str;
         std::string token;
+
+        (void) is_relative; // not needed right now
 
         // safety check
         if(path.empty())

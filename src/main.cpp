@@ -12,11 +12,13 @@ using wwwserver::Path;
 
 void usage(char *prgm_name)
 {
+    // print usage information
     std::cerr << "Usage: " << prgm_name << " [options]" << std::endl;
     std::cerr << std::endl << "Options:" << std::endl;
     std::cerr << "\t-h (help)" << std::endl;
     std::cerr << "\t-p [port #]" << std::endl;
     std::cerr << "\t-w [web root]" << std::endl;
+    std::cerr << "\t-s [enable single user/disable mutli-process]" << std::endl;
     std::cerr << std::endl;
 
     exit(1);
@@ -27,9 +29,12 @@ int main(int argc, char **argv)
     std::stringstream ss;
     std::string arg;
     int port = 8000;
+    bool single_user = false;
 
+    // print our generic server name
     std::cout << "wwwserver/0.1" << std::endl;
 
+    // pick the default web root directory
     Path my_dir;
     Path web_dir(my_dir.str() + "/www");
 
@@ -59,6 +64,10 @@ int main(int argc, char **argv)
             }
             web_dir.setPath(arg);
         }
+        else if(arg == "-s")
+        {
+            single_user = true;
+        }
         else
         {
             std::cerr << "Could not parse argument: " << arg << std::endl;
@@ -66,10 +75,13 @@ int main(int argc, char **argv)
         }
     }
 
+    // Let the user know the set up parameters
     std::cout << "Setting up server with web root of " << web_dir.str() << " on port " << port << std::endl;
 
-    wwwserver::Server s(port, web_dir.str());
+    // create the server
+    wwwserver::Server s(port, web_dir.str(), single_user);
 
+    // attempt to set up the socket
     try
     {
         s.setup();
@@ -80,6 +92,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    // listen and service requests in the main loop of the server
     try
     {
         s.loop();

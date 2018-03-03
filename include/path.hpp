@@ -71,7 +71,7 @@ namespace wwwserver
 
         /**
          * @brief Determines if path is a cgi script
-         * 
+         *
          * @return true file is a cgi script
          * @return false file is not a cgi script
          */
@@ -188,6 +188,10 @@ namespace wwwserver
          */
         std::vector<std::string> vec() const;
 
+        /**
+         * @brief Used to determine the size of the file at the current path
+         * @return Size of the file in bytes
+         */
         size_t filesize() const;
 
     private:

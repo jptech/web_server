@@ -21,7 +21,8 @@ namespace wwwserver
          * @param port The server will be hosted at this port.
          * @param web_dir The directory to be hosted by the server.
          */
-        Server(int port, std::string web_dir) : m_web_dir(web_dir), m_setup(false), m_port_num(port) {}
+        Server(int port, std::string web_dir, bool single_user = false) :
+            m_web_dir(web_dir), m_setup(false), m_port_num(port), m_single_user(single_user) {}
 
         /**
          * setup
@@ -55,6 +56,9 @@ namespace wwwserver
 
         /* the socket file descriptor for listenting for new connections */
         int m_socket;
+
+        /* toggles the single user mode when true; uses multi-processing when false */
+        bool m_single_user;
 
     };
 }

@@ -68,7 +68,7 @@ namespace wwwserver
         int pid;
         char *alist = NULL;
         std::string line;
-        
+
         m_response << "Content-Type: text/html" << std::endl << std::endl;
 
         if(pipe(pipefd) != 0)
@@ -80,7 +80,7 @@ namespace wwwserver
             m_response << "<html>" << std::endl;
             m_response << "<body><p> CGI output for " << file.str() <<"</p>" << std::endl;
             pid = fork();
-            
+
             /* child fork */
             if(pid == 0)
             {
@@ -94,7 +94,7 @@ namespace wwwserver
                 /* run the cgi script */
                 execvp(file.str().c_str(), &alist);
                 std::cerr << "Failure to launch cgi\n";
-                m_response << "CGI Error: Failed to open " << file.str() 
+                m_response << "CGI Error: Failed to open " << file.str()
                     << "</body></html>" << std::endl;
             }
             /* parent fork */
@@ -132,7 +132,9 @@ namespace wwwserver
     void HttpResponse::loadString(std::string &content)
     {
         m_response << "Content-Type: text/html" << std::endl;
+        m_response << "Content-Length: " << content.size() << std::endl;
 
+        // simply outputs the content of the string
         m_response << std::endl;
         m_response << content;
     }
@@ -141,6 +143,7 @@ namespace wwwserver
     {
         m_response << "Content-Type: text/html" << std::endl << std::endl;
 
+        // get the subdirectories and files within the chosen directory
         std::vector<Path> dirs = dir.getChildrenDirs();
         std::vector<Path> files = dir.getChildrenFiles();
 
@@ -164,12 +167,13 @@ namespace wwwserver
                    << "\t<h2>" << dir_str << "</h2>" << std::endl
                    << "\t<ul>" << std::endl;
 
+        // if appropriate, allow the user to go to the parent directory
         if(dir_str.size() != 0)
         {
             m_response << "\t\t<li><a href='" << dir_str << "/..'>Parent Directory</a></li>" << std::endl;
         }
 
-        // Process subdirectories first
+        // Process subdirectories first to be at the top of the listing
         for(Path const &p : dirs)
         {
             std::string path_str = "/" + p.str().substr(web_dir_str.size()+1);
@@ -197,6 +201,7 @@ namespace wwwserver
     {
         std::string error_msg;
 
+        // currently, we support 404 and 500 errors
         switch(code)
         {
             case 404: error_msg = "Page Not Found"; break;
@@ -206,6 +211,7 @@ namespace wwwserver
 
         m_response << "Content-Type: text/html" << std::endl << std::endl;
 
+        // build the error page using the given error code & string
         m_response << "<!DOCTYPE html>" << std::endl
                    << "<html>" << std::endl
                    << "<head>" << std::endl
@@ -232,6 +238,7 @@ namespace wwwserver
 
     void HttpResponse::writeSocket(int socket_fd)
     {
+        // write the current response buffer
         int ret = write(socket_fd, m_response.str().c_str(), m_response.str().size());
         if(ret < 0)
         {
@@ -240,6 +247,7 @@ namespace wwwserver
             throw ClientSocketFailure(ss.str());
         }
 
+        // if sending a file, do it through a buffered read/write loop
         if(m_load_file)
         {
             const int buf_size = 8192;
@@ -250,6 +258,7 @@ namespace wwwserver
             int rd = read(file_fd, buf, buf_size);
             int wr = 1;
 
+            // read the entire file in 8K chunks and send as you go
             while(rd > 0 && wr > 0)
             {
                 wr = write(socket_fd, buf, rd);
@@ -266,6 +275,7 @@ namespace wwwserver
         std::string req_cmd;
         m_request = request;
 
+        // load the request and get the request type (i.e. GET)
         ss << request;
         ss >> req_cmd;
 
@@ -282,6 +292,7 @@ namespace wwwserver
     {
         HttpResponse response(m_web_dir);
 
+        // Handle different types of requests
         switch(m_req_type)
         {
             case HttpRequestType::GET:
@@ -310,14 +321,17 @@ namespace wwwserver
 
         ss >> cmd >> req_file >> http_ver;
 
+        // resolve the path to the requested file
         Path file = Path(m_web_dir + req_file);
 
+        // check if a file or directory exists at that path
         if(! file.exists())
         {
             response_code = 404;
             std::cout << "File not found" << std::endl;
         }
 
+        // check if a file or directory
         if(file.isDir())
         {
             Path idx_file = file + "/index.html";
@@ -332,11 +346,13 @@ namespace wwwserver
             }
         }
 
+        // make our HTTP header with the chosen response code (i.e. 200)
         response.generateHeader(response_code);
 
         if(response_code == 200)
         {
-            if(send_file) 
+            // if we are sending a file, determine if it is static or cgi
+            if(send_file)
             {
                 if(file.isCgi())
                 {
@@ -347,7 +363,11 @@ namespace wwwserver
                     response.loadFile(file);
                 }
             }
-            else response.loadDirListing(file);
+            // otherwise, we can show a directory listing
+            else
+            {
+                response.loadDirListing(file);
+            }
         }
         else
         {
@@ -357,11 +377,11 @@ namespace wwwserver
 
     void HttpParse::parsePost(HttpResponse &response)
     {
-        int response_code = 200;
         std::stringstream sin(m_request);
         std::string line;
         std::ofstream fout;
 
+        // put the post data into a file as a demonstration 
         while(getline(sin, line) && line.size() > 2);
         fout.open("formdata.txt");
         while(getline(sin, line))
